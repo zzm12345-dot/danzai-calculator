@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蛋仔派对充值折扣计算器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 25px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        border-radius: 15px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .result-value {
+        font-size: 20px;
+      }
+    }
+
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .radio-option {
+      flex: 1;
+    }
+
+    .radio-option input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .results {
+      margin-top: 30px;
+      padding: 25px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      border-radius: 15px;
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #d0d0d0;
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .result-label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .result-value {
+      color: #333;
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .profit-positive {
+      color: #4caf50;
+    }
+
+    .profit-negative {
+      color: #f44336;
+    }
+
+    .profit-zero {
+      color: #9e9e9e;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🥚 蛋仔派对充值计算器</h1>
+
+    <div class="form-group">
+      <label>选择日期类型</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" id="rebate" name="dayType" value="rebate" checked>
+          <label for="rebate">返利日</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="normal" name="dayType" value="normal">
+          <label for="normal">非返利日</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="rechargeAmount">充值金额（元）</label>
+      <input type="number" id="rechargeAmount" placeholder="例如：328" step="0.01">
+    </div>
+
+    <div class="form-group">
+      <label for="actualPayment">实际付款金额（元）</label>
+      <input type="number" id="actualPayment" placeholder="例如：246" step="0.01">
+    </div>
+
+    <button class="btn" onclick="calculate()">计算</button>
+
+    <div class="form-group" style="margin-top: 20px;">
+      <label for="eggRate">蛋币兑换比例（元/蛋币）</label>
+      <input type="number" id="eggRate" placeholder="例如：0.065" step="0.001">
+    </div>
+
+    <div class="form-group">
+      <label for="couponRate">无门槛优惠券兑换比例（元/优惠券）</label>
+      <input type="number" id="couponRate" placeholder="例如：0.7" step="0.01">
+    </div>
+
+    <button class="btn" onclick="calculateProfit()">计算利润</button>
+
+    <div class="results" id="results">
+      <div class="result-item">
+        <div class="result-label">获得蛋币</div>
+        <div class="result-value" id="eggCoins">-</div>
+      </div>
+      <div class="result-item" id="couponItem">
+        <div class="result-label">无门槛优惠券</div>
+        <div class="result-value" id="coupons">-</div>
+      </div>
+      <div class="result-item" id="totalReturnItem">
+        <div class="result-label">兑换后总金额（元）</div>
+        <div class="result-value" id="totalReturn">-</div>
+      </div>
+      <div class="result-item" id="profitItem">
+        <div class="result-label">赚取金额（元）</div>
+        <div class="result-value" id="profit">-</div>
+      </div>
+      <div class="result-item" id="discountItem">
+        <div class="result-label">折扣</div>
+        <div class="result-value" id="discount">-</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const rechargeTiers = [
+      { amount: 30, eggCoins: 318 },
+      { amount: 68, eggCoins: 725 },
+      { amount: 128, eggCoins: 1368 },
+      { amount: 198, eggCoins: 2118 },
+      { amount: 328, eggCoins: 3548 },
+      { amount: 648, eggCoins: 7068 }
+    ];
+
+    function getEggCoins(rechargeAmount) {
+      for (let i = rechargeTiers.length - 1; i >= 0; i--) {
+        if (rechargeAmount >= rechargeTiers[i].amount) {
+          return rechargeTiers[i].eggCoins;
+        }
+      }
+      return 0;
+    }
+
+    function getCoupons(actualPayment, isRebateDay) {
+      if (!isRebateDay) return 0;
+
+      let rate = 0;
+      if (actualPayment >= 30 && actualPayment <= 127) {
+        rate = 0.10;
+      } else if (actualPayment >= 128 && actualPayment <= 327) {
+        rate = 0.15;
+      } else if (actualPayment >= 328 && actualPayment <= 647) {
+        rate = 0.20;
+      } else if (actualPayment >= 648) {
+        rate = 0.25;
+      }
+
+      const couponValue = actualPayment * rate;
+      return Math.ceil(couponValue);
+    }
+
+    let eggCoinsResult = 0;
+    let couponsResult = 0;
+
+    function calculate() {
+      const rechargeAmount = parseFloat(document.getElementById('rechargeAmount').value);
+      const actualPayment = parseFloat(document.getElementById('actualPayment').value);
+      const dayType = document.querySelector('input[name="dayType"]:checked').value;
+      const isRebateDay = dayType === 'rebate';
+
+      if (isNaN(rechargeAmount) || isNaN(actualPayment)) {
+        alert('请输入有效的充值金额和实际付款金额');
+        return;
+      }
+
+      eggCoinsResult = getEggCoins(rechargeAmount);
+      couponsResult = getCoupons(actualPayment, isRebateDay);
+
+      document.getElementById('eggCoins').textContent = eggCoinsResult + ' 蛋币';
+      document.getElementById('coupons').textContent = couponsResult + ' 张';
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.classList.add('show');
+
+      document.getElementById('couponItem').style.display = isRebateDay ? 'block' : 'none';
+      document.getElementById('totalReturnItem').style.display = 'none';
+      document.getElementById('profitItem').style.display = 'none';
+      document.getElementById('discountItem').style.display = 'none';
+    }
+
+    function calculateProfit() {
+      const eggRate = parseFloat(document.getElementById('eggRate').value);
+      const couponRate = parseFloat(document.getElementById('couponRate').value);
+      const actualPayment = parseFloat(document.getElementById('actualPayment').value);
+      const dayType = document.querySelector('input[name="dayType"]:checked').value;
+      const isRebateDay = dayType === 'rebate';
+
+      if (eggCoinsResult === 0) {
+        alert('请先点击"计算"按钮');
+        return;
+      }
+
+      if (isNaN(eggRate) || (isRebateDay && isNaN(couponRate))) {
+        alert('请输入有效的兑换比例');
+        return;
+      }
+
+      let totalReturn = eggCoinsResult * eggRate;
+      if (isRebateDay) {
+        totalReturn += couponsResult * couponRate;
+      }
+
+      const profit = totalReturn - actualPayment;
+      const newTotal = 0.1 * eggCoinsResult + couponsResult;
+      const discount = newTotal > 0 ? actualPayment / newTotal : 0;
+
+      document.getElementById('totalReturn').textContent = totalReturn.toFixed(2) + ' 元';
+      const profitElement = document.getElementById('profit');
+      profitElement.textContent = profit.toFixed(2) + ' 元';
+
+      profitElement.classList.remove('profit-positive', 'profit-negative', 'profit-zero');
+      if (profit > 0) {
+        profitElement.classList.add('profit-positive');
+      } else if (profit < 0) {
+        profitElement.classList.add('profit-negative');
+      } else {
+        profitElement.classList.add('profit-zero');
+      }
+
+      document.getElementById('discount').textContent = discount.toFixed(4) + ' 折';
+
+      document.getElementById('totalReturnItem').style.display = 'block';
+      document.getElementById('profitItem').style.display = 'block';
+      document.getElementById('discountItem').style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>
