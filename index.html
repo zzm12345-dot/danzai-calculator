@@ -1821,7 +1821,12 @@
         const couponDiscount = parseFloat(document.getElementById('couponDiscount').value) || 0;
         const couponFixedAmount = parseFloat(document.getElementById('fixedAmount').value) || 0;
         const couponThreshold = parseFloat(document.getElementById('minAmount').value) || 0;
-        const couponAmount = parseFloat(document.getElementById('couponAmount').value) || 0;
+        let couponAmount = 0;
+        if (couponType === 'discount') {
+          couponAmount = parseFloat(document.getElementById('couponAmount').value) || 0;
+        } else {
+          couponAmount = couponFixedAmount;
+        }
         const isRebateDay = document.querySelector('input[name="couponDayType"]:checked').value === 'rebate';
 
         // 获取自定义充值方案
