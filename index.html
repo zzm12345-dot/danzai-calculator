@@ -955,8 +955,8 @@
 
         if (couponType === 'discount') {
           useType = document.querySelector('input[name="useType"]:checked').value;
-          couponAmount = parseFloat(document.getElementById('couponAmount').value);
-          couponDiscount = parseFloat(document.getElementById('couponDiscount').value);
+          couponAmount = parseFloat(document.getElementById('couponAmount').value) || 0;
+          couponDiscount = parseFloat(document.getElementById('couponDiscount').value) || 0;
           if (isNaN(couponDiscount)) {
             alert('请输入有效的折扣值');
             return;
@@ -969,10 +969,6 @@
             alert('优惠券折扣必须大于0');
             return;
           }
-          if (isNaN(couponAmount)) {
-            alert('请输入有效的可抵金额');
-            return;
-          }
           if (couponAmount < 0) {
             alert('可抵金额必须大于等于0');
             return;
@@ -980,8 +976,8 @@
         } else {
           // 金额券：优惠金额就是可抵金额，强制单次使用
           useType = 'single';
-          minAmount = parseFloat(document.getElementById('minAmount').value);
-          fixedAmount = parseFloat(document.getElementById('fixedAmount').value);
+          minAmount = parseFloat(document.getElementById('minAmount').value) || 0;
+          fixedAmount = parseFloat(document.getElementById('fixedAmount').value) || 0;
           couponAmount = fixedAmount; // 优惠金额就是可抵金额
           if (isNaN(minAmount)) {
             alert('请输入有效的使用门槛');
@@ -1717,6 +1713,8 @@
                     } else {
                       stepActualPayment = amount;
                     }
+                    // 金额券单次使用，使用后剩余金额为0
+                    stepRemainingCoupon = 0;
                   }
 
                   // 计算本次获得的优惠券
