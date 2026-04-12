@@ -1592,8 +1592,8 @@
               remainingCoupon -= actualDiscount;
             } else {
               // 金额券
-              if (tier.amount >= couponThreshold) {
-                actualPayment = tier.amount - couponFixedAmount;
+              if (tier.amount >= minAmount) {
+                actualPayment = tier.amount - fixedAmount;
               } else {
                 actualPayment = tier.amount;
               }
@@ -1712,8 +1712,8 @@
                     stepRemainingCoupon -= actualDiscount;
                   } else {
                     // 金额券
-                    if (amount >= couponThreshold) {
-                      stepActualPayment = amount - couponFixedAmount;
+                    if (amount >= minAmount) {
+                      stepActualPayment = amount - fixedAmount;
                     } else {
                       stepActualPayment = amount;
                     }
