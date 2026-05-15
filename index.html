@@ -103,6 +103,7 @@
       border-radius: 14px;
       color: var(--text);
       cursor: pointer;
+      user-select: none;
       transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
 
@@ -664,6 +665,17 @@
       { amount: 328, eggCoins: 3548 },
       { amount: 648, eggCoins: 7068 }
     ];
+
+    document.querySelectorAll('.radio-option').forEach(option => {
+      option.addEventListener('click', function () {
+        const radio = this.querySelector('input[type="radio"]');
+        if (!radio || radio.checked) return;
+
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+
     // 优惠券类型切换
     document.querySelectorAll('input[name="couponType"]').forEach(radio => {
       radio.addEventListener('change', function () {
