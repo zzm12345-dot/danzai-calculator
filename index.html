@@ -217,6 +217,20 @@
       transform: translateY(0);
     }
 
+    .gift-profit-section {
+      margin-top: 42px;
+      padding-top: 34px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .gift-profit-section h2 {
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 22px;
+    }
+
     .result-item {
       display: flex;
       align-items: center;
@@ -590,6 +604,53 @@
             <div class="result-value" id="couponActualDiscount">-</div>
           </div>
         </div>
+
+        <div class="gift-profit-section">
+          <h2>赠送礼品利润计算</h2>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="giftEggCoins">赠送礼品蛋币数</label>
+              <input type="number" id="giftEggCoins" placeholder="例如：1000" step="1">
+            </div>
+            <div class="form-group">
+              <label for="giftRechargeDiscount">充值时折扣</label>
+              <input type="number" id="giftRechargeDiscount" placeholder="例如：0.5 或 5" step="0.01">
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="giftSaleDiscount">赠送折扣</label>
+              <input type="number" id="giftSaleDiscount" placeholder="例如：0.7 或 7" step="0.01">
+            </div>
+            <div class="form-group">
+              <label for="giftBaseRate">蛋币标价比例（元/蛋币）</label>
+              <input type="number" id="giftBaseRate" value="0.1" placeholder="例如：0.1" step="0.001">
+            </div>
+          </div>
+
+          <button class="btn" onclick="calculateGiftProfit()">计算礼品利润</button>
+
+          <div class="results" id="giftProfitResults">
+            <div class="result-item">
+              <div class="result-label">礼品标价</div>
+              <div class="result-value" id="giftBaseAmount">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">充值成本</div>
+              <div class="result-value" id="giftCost">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">出售价</div>
+              <div class="result-value" id="giftSalePrice">-</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">预估利润</div>
+              <div class="result-value" id="giftProfit">-</div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -662,6 +723,60 @@
       }
 
       return { eggRate, couponRate };
+    }
+
+    function normalizeDiscount(value) {
+      if (isNaN(value) || value <= 0) return NaN;
+      return value > 1 ? value / 10 : value;
+    }
+
+    function calculateGiftProfit() {
+      const eggCoins = parseFloat(document.getElementById('giftEggCoins').value);
+      const rechargeDiscount = normalizeDiscount(parseFloat(document.getElementById('giftRechargeDiscount').value));
+      const saleDiscount = normalizeDiscount(parseFloat(document.getElementById('giftSaleDiscount').value));
+      const baseRate = parseFloat(document.getElementById('giftBaseRate').value);
+
+      if (isNaN(eggCoins) || eggCoins <= 0) {
+        alert('请输入有效的赠送礼品蛋币数');
+        return;
+      }
+
+      if (isNaN(rechargeDiscount) || rechargeDiscount > 1) {
+        alert('请输入有效的充值时折扣，例如 0.5 或 5 表示五折');
+        return;
+      }
+
+      if (isNaN(saleDiscount) || saleDiscount > 1) {
+        alert('请输入有效的赠送折扣，例如 0.7 或 7 表示七折');
+        return;
+      }
+
+      if (isNaN(baseRate) || baseRate <= 0) {
+        alert('请输入有效的蛋币标价比例');
+        return;
+      }
+
+      const baseAmount = eggCoins * baseRate;
+      const cost = baseAmount * rechargeDiscount;
+      const salePrice = baseAmount * saleDiscount;
+      const profit = salePrice - cost;
+
+      document.getElementById('giftBaseAmount').textContent = baseAmount.toFixed(2) + ' 元';
+      document.getElementById('giftCost').textContent = cost.toFixed(2) + ' 元';
+      document.getElementById('giftSalePrice').textContent = salePrice.toFixed(2) + ' 元';
+
+      const profitElement = document.getElementById('giftProfit');
+      profitElement.textContent = profit.toFixed(2) + ' 元';
+      profitElement.classList.remove('profit-positive', 'profit-negative', 'profit-zero');
+      if (profit > 0) {
+        profitElement.classList.add('profit-positive');
+      } else if (profit < 0) {
+        profitElement.classList.add('profit-negative');
+      } else {
+        profitElement.classList.add('profit-zero');
+      }
+
+      document.getElementById('giftProfitResults').classList.add('show');
     }
 
     function analyzeCoupon() {
